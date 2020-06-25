@@ -1,0 +1,120 @@
+package com.thiagojacinto.osrestapi.api.controllers;
+
+import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static io.restassured.module.mockmvc.RestAssuredMockMvc.standaloneSetup;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+
+import java.util.Collections;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thiagojacinto.osrestapi.domain.models.Cliente;
+import com.thiagojacinto.osrestapi.domain.repository.ClienteRepository;
+import com.thiagojacinto.osrestapi.domain.service.CadastroClienteService;
+
+import io.restassured.http.ContentType;
+
+@WebMvcTest(controllers = ClienteController.class)
+public class ClienteControllerTest {
+
+	@Autowired
+	private ClienteController clienteController;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
+
+	@MockBean
+	private CadastroClienteService cadastroClienteService;
+
+	@MockBean
+	private ClienteRepository clienteRepository;
+
+	@BeforeEach
+	public void setup() {
+		// Static imported from RestAssuredMockMvc
+		standaloneSetup(this.clienteController);
+	}
+
+	@Test
+	public void deveRetornarSucesso_QuandoBuscarPorCliente() {
+
+		Mockito.when(this.clienteRepository.findById(1L))
+			.thenReturn(Optional.of(new Cliente()));
+
+		given()
+				.accept(ContentType.JSON)
+			.when()
+				.get("/clientes/{clienteId}", 1L)
+			.then()
+				.statusCode(HttpStatus.OK.value());
+
+	}
+	
+	@Test
+	public void deveRetornarFalha_QuandoBuscarPorClienteInexistente() {
+
+		Mockito.when(this.clienteRepository.findById(10000000L))
+			.thenReturn(Optional.ofNullable(null));
+
+		given()
+			.accept(ContentType.JSON)
+		.when()
+			.get("/clientes/{clienteId}", 10000000L)
+		.then()
+			.statusCode(HttpStatus.NOT_FOUND.value());
+	}
+	
+	@Test
+	public void deveRetornarArrayVazio_QuandoListarCursosSemNenhumCadastrado() {
+		
+		Mockito.when(this.clienteRepository.findAll())
+			.thenReturn(Collections.emptyList());
+		
+		given()
+			.accept(ContentType.JSON)
+		.when()
+			.get("/clientes")
+		.then()
+			.statusCode(HttpStatus.OK.value())
+			.contentType(ContentType.JSON)
+			.body(is(equalTo("[]")));
+		
+	}
+	
+	@Test
+	public void deveRetornarSucesso_QuandoCadastrarNovoCliente() throws JsonProcessingException {
+		
+		Cliente novoCliente = new Cliente("Thiago", "Address", "mail@mail.mail", "+55 83 99999 9999"); 
+		String clientToString = objectMapper.writeValueAsString(novoCliente);
+		
+		Mockito.when(this.cadastroClienteService.salvar(novoCliente))
+			.thenReturn(novoCliente);
+		
+		given()
+			.accept("application/json;charset=utf-8")
+			.contentType("application/json;charset=utf-8")
+			.body(clientToString)
+		.when()
+			.post("/clientes")
+		.then()
+			.contentType(ContentType.JSON)
+			.log().ifValidationFails()
+			.statusCode(HttpStatus.CREATED.value())
+			.assertThat()
+				.body("nome", equalTo(novoCliente.getNome()))
+				.body("endereco", equalTo(novoCliente.getEndereco()))
+				.body("email", equalTo(novoCliente.getEmail()))
+				.body("telefone", equalTo(novoCliente.getTelefone()));
+		
+	}
+}
