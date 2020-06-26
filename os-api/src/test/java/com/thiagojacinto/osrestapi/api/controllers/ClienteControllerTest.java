@@ -4,6 +4,8 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.standaloneSetup;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -115,6 +117,99 @@ public class ClienteControllerTest {
 				.body("endereco", equalTo(novoCliente.getEndereco()))
 				.body("email", equalTo(novoCliente.getEmail()))
 				.body("telefone", equalTo(novoCliente.getTelefone()));
+	}
+	
+	@Test
+	public void deveFalhar_QuandoInserirUmClienteComNomeEmBranco() throws JsonProcessingException {
+		
+		Cliente clienteNomeEmBranco = new Cliente();
+		clienteNomeEmBranco.setNome("");
+		clienteNomeEmBranco.setEmail("email@email.email");
+		clienteNomeEmBranco.setEndereco("Address");
+		clienteNomeEmBranco.setTelefone("+55 81 99999-9999");
+		
+		String clienteEmString = objectMapper.writeValueAsString(clienteNomeEmBranco);
+		
+		Mockito.when(this.clienteRepository.existsById(1L))
+			.thenReturn(true);
+		
+		Mockito.when(this.cadastroClienteService.salvar(clienteNomeEmBranco))
+			.thenReturn(clienteNomeEmBranco);
+		
+		given()
+			.accept("application/json;charset=utf-8")
+			.contentType("application/json;charset=utf-8")
+			.body(clienteEmString)
+		.when()
+			.post("/clientes")
+		.then()
+			.expect(result -> 
+				assertTrue(result.getResolvedException() instanceof org.springframework.web.bind.MethodArgumentNotValidException))
+			.log().ifValidationFails()
+			.expect(result -> result.getResolvedException().getMessage().contains("[must not be blank]"));
+
 		
 	}
+	
+	@Test
+	public void deveFalhar_QuandoInserirUmClienteComEmailEmBranco() throws JsonProcessingException {
+		
+		Cliente clienteEmailEmBranco = new Cliente();
+		clienteEmailEmBranco.setNome("Nome");
+		clienteEmailEmBranco.setEmail("");
+		clienteEmailEmBranco.setEndereco("Address");
+		clienteEmailEmBranco.setTelefone("+55 81 99999-9999");
+		
+		String clienteEmString = objectMapper.writeValueAsString(clienteEmailEmBranco);
+		
+		Mockito.when(this.clienteRepository.existsById(1L))
+			.thenReturn(true);
+		
+		Mockito.when(this.cadastroClienteService.salvar(clienteEmailEmBranco))
+			.thenReturn(clienteEmailEmBranco);
+		
+		given()
+			.accept("application/json;charset=utf-8")
+			.contentType("application/json;charset=utf-8")
+			.body(clienteEmString)
+		.when()
+			.post("/clientes")
+		.then()
+			.expect(result -> 
+				assertTrue(result.getResolvedException() instanceof org.springframework.web.bind.MethodArgumentNotValidException))
+			.log().ifValidationFails()
+			.expect(result -> result.getResolvedException().getMessage().contains("[must not be blank]"));
+
+		
+	}
+	
+	@Test
+	public void deveFalhar_QuandoInserirUmClienteComEnderecoEmBranco() throws JsonProcessingException {
+		
+		Cliente clienteEnderecoEmBranco = new Cliente();
+		clienteEnderecoEmBranco.setNome("Nome");
+		clienteEnderecoEmBranco.setEmail("email@email.email");
+		clienteEnderecoEmBranco.setEndereco("");
+		clienteEnderecoEmBranco.setTelefone("+55 81 99999-9999");
+		
+		String clienteEmString = objectMapper.writeValueAsString(clienteEnderecoEmBranco);
+		
+		Mockito.when(this.clienteRepository.existsById(1L))
+			.thenReturn(true);
+		
+		Mockito.when(this.cadastroClienteService.salvar(clienteEnderecoEmBranco))
+			.thenReturn(clienteEnderecoEmBranco);
+		
+		given()
+			.accept("application/json;charset=utf-8")
+			.contentType("application/json;charset=utf-8")
+			.body(clienteEmString)
+		.when()
+			.post("/clientes")
+		.then()
+			.expect(result -> 
+				assertTrue(result.getResolvedException() instanceof org.springframework.web.bind.MethodArgumentNotValidException))
+			.expect(result -> result.getResolvedException().getMessage().contains("[must not be blank]"));
+	}
+	
 }
