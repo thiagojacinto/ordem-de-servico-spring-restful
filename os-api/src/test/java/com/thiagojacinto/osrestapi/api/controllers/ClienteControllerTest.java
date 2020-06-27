@@ -271,4 +271,66 @@ public class ClienteControllerTest {
 			.statusCode(HttpStatus.NOT_FOUND.value());
 			
 	}
+	
+	@Test
+	public void deveFalhar_QuandoAtualizarUmClienteComCamposInvalidos() throws JsonProcessingException {
+		
+		Cliente clienteAtualizado = new Cliente();
+		clienteAtualizado.setId(1L);
+		clienteAtualizado.setNome("Nome atualizado");
+		clienteAtualizado.setEmail("");
+		clienteAtualizado.setEndereco("Address");
+		clienteAtualizado.setTelefone("+55 81 99999-9999");
+		
+		String clienteAtualizadoEmString = objectMapper.writeValueAsString(clienteAtualizado);
+		
+		Mockito.when(this.clienteRepository.existsById(1L))
+			.thenReturn(true);
+		
+		given()
+			.accept("application/json;charset=utf-8")
+			.contentType("application/json;charset=utf-8")
+			.body(clienteAtualizadoEmString)
+		.when()
+			.put("/clientes/{clienteId}", 1L)
+		.then()
+			.expect(result -> assertTrue(result.getResolvedException() instanceof org.springframework.web.bind.MethodArgumentNotValidException));
+			
+	}
+	
+	@Test
+	public void deveRetornarSucesso_QuandoDeletarUmClienteExistente() {
+		
+		Mockito.when(this.clienteRepository.existsById(1L))
+			.thenReturn(true);
+		
+		Mockito.doNothing()
+			.when(this.cadastroClienteService)
+			.remover(1L);
+		
+		given()
+			.accept(ContentType.JSON)
+		.when()
+			.delete("/clientes/{clienteId}", 1L)
+		.then()
+			.statusCode(equalTo(HttpStatus.NO_CONTENT.value()));
+		
+		Mockito.verify(this.cadastroClienteService)
+		.remover(1L);
+	}
+	
+	@Test
+	public void deveFalhar_QuandoDeletarUmClienteQueNaoExiste() {
+		
+		Mockito.when(this.clienteRepository.existsById(1L))
+			.thenReturn(false);
+		
+		given()
+			.accept(ContentType.JSON)
+		.when()
+			.delete("/clientes/{clienteId}", 1L)
+		.then()
+			.statusCode(equalTo(HttpStatus.NOT_FOUND.value()));
+		
+	}
 }
