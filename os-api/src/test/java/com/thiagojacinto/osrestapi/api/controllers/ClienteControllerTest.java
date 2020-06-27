@@ -4,7 +4,6 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.standaloneSetup;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
@@ -212,4 +211,64 @@ public class ClienteControllerTest {
 			.expect(result -> result.getResolvedException().getMessage().contains("[must not be blank]"));
 	}
 	
+	@Test
+	public void deveRetornarSucesso_QuandoAtualizarUmClienteExistente() throws JsonProcessingException {
+		
+		Cliente clienteAtualizado = new Cliente();
+		clienteAtualizado.setId(1L);
+		clienteAtualizado.setNome("Nome atualizado");
+		clienteAtualizado.setEmail("atualizado@mail.mail");
+		clienteAtualizado.setEndereco("Address");
+		clienteAtualizado.setTelefone("+55 81 99999-9999");
+		
+		String clienteAtualizadoEmString = objectMapper.writeValueAsString(clienteAtualizado);
+		
+		Mockito.when(this.clienteRepository.existsById(1L))
+			.thenReturn(true);
+		
+		Mockito.when(this.cadastroClienteService.salvar(clienteAtualizado))
+			.thenReturn(clienteAtualizado);
+		
+		given()
+			.accept("application/json;charset=utf-8")
+			.contentType("application/json;charset=utf-8")
+			.body(clienteAtualizadoEmString)
+		.when()
+			.put("/clientes/{clienteId}", 1L)
+		.then()
+			.contentType(ContentType.JSON)
+			.statusCode(HttpStatus.OK.value())
+			.assertThat()
+				.body("id", equalTo(Integer.valueOf(clienteAtualizado.getId().toString())))
+				.body("nome", equalTo(clienteAtualizado.getNome()))
+				.body("endereco", equalTo(clienteAtualizado.getEndereco()))
+				.body("email", equalTo(clienteAtualizado.getEmail()))
+				.body("telefone", equalTo(clienteAtualizado.getTelefone()));
+	}
+	
+	@Test
+	public void deveFalhar_QuandoAtualizarUmClienteQueNãoExiste() throws JsonProcessingException {
+		
+		Cliente clienteAtualizado = new Cliente();
+		clienteAtualizado.setId(1L);
+		clienteAtualizado.setNome("Nome atualizado");
+		clienteAtualizado.setEmail("atualizado@mail.mail");
+		clienteAtualizado.setEndereco("Address");
+		clienteAtualizado.setTelefone("+55 81 99999-9999");
+		
+		String clienteAtualizadoEmString = objectMapper.writeValueAsString(clienteAtualizado);
+		
+		Mockito.when(this.clienteRepository.existsById(1L))
+			.thenReturn(false);
+		
+		given()
+			.accept("application/json;charset=utf-8")
+			.contentType("application/json;charset=utf-8")
+			.body(clienteAtualizadoEmString)
+		.when()
+			.put("/clientes/{clienteId}", 1L)
+		.then()
+			.statusCode(HttpStatus.NOT_FOUND.value());
+			
+	}
 }
