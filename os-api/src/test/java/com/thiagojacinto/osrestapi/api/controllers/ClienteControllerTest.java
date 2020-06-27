@@ -332,5 +332,9 @@ public class ClienteControllerTest {
 		.then()
 			.statusCode(equalTo(HttpStatus.NOT_FOUND.value()));
 		
+		Mockito.verify(
+				this.cadastroClienteService, 
+				Mockito.times(0))
+			.remover(1L);
 	}
 }
