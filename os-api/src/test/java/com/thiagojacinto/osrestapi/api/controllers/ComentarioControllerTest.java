@@ -151,9 +151,36 @@ public class ComentarioControllerTest {
 		assertEquals(comentario.getDataPublicacao(), comentarioModel.getDataPublicacao());
 	}
 	
-//	@Test
-//	public void deveRetornarListaTipoComentarioModel_QuandoChamarMetodoConvertToComentariosList() {
-//		
-//	}
+	@Test
+	public void deveRetornarListaTipoComentarioModel_QuandoChamarMetodoConvertToComentariosList() {
+		
+		OrdemServico os = Mockito.mock(OrdemServico.class);
+		List<Comentario> listaComentarios = new ArrayList<Comentario>();
+		
+		Comentario comentario1 = new Comentario();
+		comentario1.setDataPublicacao(OffsetDateTime.MIN);
+		comentario1.setDescricao("novo comentario");
+		comentario1.setOrdemServico(os);
+		
+		Comentario comentario2 = new Comentario();
+		comentario2.setDataPublicacao(OffsetDateTime.MIN);
+		comentario2.setDescricao("novo comentario 2");
+		comentario2.setOrdemServico(os);
+		
+		Comentario comentario3 = new Comentario();
+		comentario3.setDataPublicacao(OffsetDateTime.MAX);
+		comentario3.setDescricao("novo comentario 3 - lastOne");
+		comentario3.setOrdemServico(os);
+		
+		listaComentarios.add(comentario1);
+		listaComentarios.add(comentario2);
+		listaComentarios.add(comentario3);
+		
+		List<ComentarioModel> resultadoListaConvertida = ReflectionTestUtils
+				.invokeMethod(comentarioController, "convertToComentariosList", listaComentarios);
+		
+		assertEquals(3, resultadoListaConvertida.size());
+		assertEquals(comentario3.getDataPublicacao(), resultadoListaConvertida.get(2).getDataPublicacao());
+	}
 	
 }
