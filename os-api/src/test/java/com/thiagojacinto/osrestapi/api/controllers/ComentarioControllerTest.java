@@ -4,7 +4,6 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.standaloneSetup;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -13,18 +12,18 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.util.NestedServletException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thiagojacinto.osrestapi.api.exceptionhandler.ApiExceptionHandler;
 import com.thiagojacinto.osrestapi.api.model.ComentarioInputModel;
 import com.thiagojacinto.osrestapi.api.model.ComentarioModel;
 import com.thiagojacinto.osrestapi.core.ModelMapperConfig;
@@ -43,9 +42,6 @@ public class ComentarioControllerTest {
 	private ComentarioController comentarioController;
 	
 	@Autowired
-	private ModelMapper modelMapper;
-	
-	@Autowired
 	private ObjectMapper objectMapper;
 	
 	@MockBean
@@ -54,55 +50,57 @@ public class ComentarioControllerTest {
 	@MockBean
 	private GestaoComentarioService comentarioService;
 	
+	@InjectMocks
+	private ApiExceptionHandler apiExceptionHandler;
+	
 	@MockBean
 	private ComentarioModel comentarioModel;
 	
 	@MockBean
 	private ComentarioInputModel comentarioInputModel;
-	
+		
 	@BeforeEach
 	public void setup() {
-		standaloneSetup(this.comentarioController);
+		standaloneSetup(this.comentarioController, this.apiExceptionHandler);
 	}
 	
 	@Test
 	public void deveRetornarComentarios_QuandoProcurarPorOrdemServicoRegistrada() {
 		
-		@SuppressWarnings("unchecked")
-		List<Comentario> comentariosMock = Mockito.mock(ArrayList.class);
+		List<Comentario> comentarios = new ArrayList<Comentario>();
 		
 		OrdemServico OSMock = Mockito.mock(OrdemServico.class);
-		OSMock.setComentarios(comentariosMock);
+		OSMock.setComentarios(comentarios);
 		
 		Mockito.when(ordemServicoRepository.findById(1L))
 			.thenReturn(Optional.of(OSMock));
 		
 		given()
-			.accept(ContentType.JSON)
-		.when()
-			.get("/os/{ordemServicoId}/comentarios", 1L)
-		.then()
-			.contentType(ContentType.JSON)
-			.statusCode(HttpStatus.OK.value())
-			.assertThat()
-				.body(equalTo("[]"));
+				.accept(ContentType.JSON)
+			.when()
+				.get("/os/{ordemServicoId}/comentarios", 1L)
+			.then()
+				.contentType(ContentType.JSON)
+				.statusCode(HttpStatus.OK.value())
+				.assertThat()
+					.body(equalTo("[]"));
 		
 	}
 	
 	@Test
-	public void deveRetornarException_QuandoNãoEncontrarRecurso() {
+	public void deveRetornarExceptionHandler_QuandoNãoEncontrarRecurso() {
 		
 		Mockito.when(ordemServicoRepository.findById(1L))
 			.thenReturn(Optional.empty());
 		
-		assertThrows(NestedServletException.class, 
-		() -> given()
+		given()
 				.accept(ContentType.JSON)
 			.when()
 				.get("/os/{ordemServicoId}/comentarios", 1L)
 			.then()
 				.log().ifError()
-		);
+				.assertThat()
+					.body("titulo", equalTo("Ordem de serviço não encontrada."));
 	}
 	
 	@Test
