@@ -15,5 +15,14 @@ Revisar e aprender técnicas de desenvolvimento de API RESTful com as potenciali
 ## B Ô N U S
 
 > *Testes, testes e mais testes!*
+### a. _Testando_
 
 Testes realizados com JUint e Mockito direto do Spring Boot Test Starter e também com [SpringMockMvc](https://mvnrepository.com/artifact/io.rest-assured/spring-mock-mvc). Confira o link direto [clicando aqui](https://github.com/thiagojacinto/ordem-de-servico-spring-restful/tree/master/os-api/src/test/java/com/thiagojacinto/osrestapi).
+
+### b. _Documentação da API_
+
+Utilizando a biblioteca [SpringFox](http://springfox.github.io/springfox/docs/current/#configuring-springfox) que implementa o Swagger, em sua versão 3.0.0, foi implementada a documentação da API. Essa pode ser acessada pelo endpoint `localhost:8080/swagger-ui/` pelo browser assim que o programa estiver rodando, após digitar `java -jar #RELEASE-VERSION` no terminal.
+
+<p align="center">
+  <img src="https://github.com/thiagojacinto/ordem-de-servico-spring-restful/blob/swagger-documentacao/swagger-ui-output.png?raw=true" alt="Swagger-UI printscreen"/>
+</p>

@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.thiagojacinto</groupId>
 	<artifactId>osrest-api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<name>osrest-api</name>
 	<description>Spring Boot REST API Project</description>
 
@@ -77,20 +77,40 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>spring-mock-mvc</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+	    <dependency>
+	        <groupId>io.springfox</groupId>
+	        <artifactId>springfox-boot-starter</artifactId>
+	        <version>3.0.0</version>
+	    </dependency>
+
 	</dependencies>
+	
+	<repositories>
+        <repository>
+          <id>jcenter-snapshots</id>
+          <name>jcenter</name>
+          <url>https://jcenter.bintray.com/</url>
+        </repository>
+    </repositories>
+
 
 	<build>
+
 		<plugins>
+		
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+		
 		</plugins>
-	</build>
 
+	</build>
 </project>
