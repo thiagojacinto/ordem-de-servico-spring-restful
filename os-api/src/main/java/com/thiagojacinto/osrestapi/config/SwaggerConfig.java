@@ -1,5 +1,9 @@
 package com.thiagojacinto.osrestapi.config;
 
+
+import java.time.LocalDateTime;
+import java.util.function.Predicate;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,11 +25,17 @@ public class SwaggerConfig {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.apiInfo(apiInfo())
 				.select()
-				.apis(RequestHandlerSelectors.any())
-				.paths(PathSelectors.any())
-				.build();
+					.apis(RequestHandlerSelectors.any())
+					.paths(apiPaths())
+				.build()
+				.directModelSubstitute(LocalDateTime.class, java.util.Date.class);
 	}
-	
+
+	private Predicate<String> apiPaths() {
+		return PathSelectors.regex("/os.*")
+				.or(PathSelectors.regex("/clientes.*"));
+	}
+
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
 				.title("Gestão Ordem de Serviço, em API REST")
