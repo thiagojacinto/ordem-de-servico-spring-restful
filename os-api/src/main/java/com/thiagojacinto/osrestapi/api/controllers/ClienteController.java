@@ -22,6 +22,13 @@ import com.thiagojacinto.osrestapi.domain.models.Cliente;
 import com.thiagojacinto.osrestapi.domain.repository.ClienteRepository;
 import com.thiagojacinto.osrestapi.domain.service.CadastroClienteService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
+
+@Api()
 @RestController
 @RequestMapping(path = "/clientes")
 public class ClienteController {
@@ -38,8 +45,20 @@ public class ClienteController {
 		return clientRepository.findAll();
 	}
 	
+	@ApiOperation(
+			value = "[pt-BR] Buscar um cliente a partir do seu ID. [en] Find a client by his/her ID.", 
+			notes = "",
+			nickname = "listarClientePorId")
+	 @ApiResponses(value = {
+	            @ApiResponse(code = 400, message = "[pt-BR] ID inválido. [en] Invalid ID input."),
+	            @ApiResponse(code = 404, message = "Nenhum cliente encontrado com o ID inserido. [en] Client not found with input ID.")
+	            })
 	@GetMapping("/{clienteId}") 
-	public ResponseEntity<Cliente> buscar(@PathVariable Long clienteId) {
+	public ResponseEntity<Cliente> buscar(
+			@ApiParam(value = "[pt-BR] ID válido do cliente desejado. [en] Desired client's valid ID.", 
+			required = true,
+			example = "2")
+			@PathVariable Long clienteId) {
 		Optional<Cliente> clienteProcurado = clientRepository.findById(clienteId);
 		
 		if (clienteProcurado.isPresent()) {
