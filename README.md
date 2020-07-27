@@ -24,5 +24,5 @@ Testes realizados com JUint e Mockito direto do Spring Boot Test Starter e tamb�
 Utilizando a biblioteca [SpringFox](http://springfox.github.io/springfox/docs/current/#configuring-springfox) que implementa o Swagger, em sua versão 3.0.0, foi implementada a documentação da API. Essa pode ser acessada pelo endpoint `localhost:8080/swagger-ui/` pelo browser assim que o programa estiver rodando, após digitar `java -jar #RELEASE-VERSION` no terminal.
 
 <p align="center">
-  <img src="https://github.com/thiagojacinto/ordem-de-servico-spring-restful/blob/swagger-documentacao/swagger-ui-output.png?raw=true" alt="Swagger-UI printscreen"/>
+  <img src="https://github.com/thiagojacinto/ordem-de-servico-spring-restful/blob/master/swagger-ui-output.png?raw=true" alt="Swagger-UI printscreen"/>
 </p>
