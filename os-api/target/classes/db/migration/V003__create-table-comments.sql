@@ -1,9 +1,9 @@
 create table comentario (
-	id bigint not null auto_increment,
+	id bigserial not null,
 	ordem_servico_id bigint not null,
 	descricao text not null,
-	data_publicacao datetime not null,
-	data_edicao datetime,
+	data_publicacao timestamp not null,
+	data_edicao timestamp,
 	
 	primary key (id)
 );
