@@ -1,12 +1,12 @@
 create table ordem_servico (
-	id bigint not null auto_increment,
+	id bigserial not null,
 	cliente_id bigint not null,
 	descricao text not null,
 	preco decimal(10,2) not null,
 	status varchar(20) not null,
-	data_abertura datetime not null,
-	data_modificacao datetime,
-	data_finalizacao datetime,
+	data_abertura timestamp not null,
+	data_modificacao timestamp,
+	data_finalizacao timestamp,
 	
 	primary key (id)
 );
