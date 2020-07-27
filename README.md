@@ -1,6 +1,6 @@
 # Gestão de Ordens de Serviço
 
-API RESTful para sistema de gestão de Ordem de Serviços, construída com Java 11, Spring 2.3+ e MySQL 8+. O [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) foi utilizado para melhor visualização do conteúdo do banco de dados durante o desenvolvimento.
+API RESTful para sistema de gestão de Ordem de Serviços, construída com Java 11, Spring 2.3+ e MySQL 8+. O [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) foi utilizado para melhor visualização do conteúdo do banco de dados durante o desenvolvimento. O deploy realizado no serviço Heroku adaptou o banco de dados para uso do PostgreSQL -> https://os-restapi.herokuapp.com/swagger-ui/
 
 ## ***O quê?***
 
